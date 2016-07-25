@@ -28,9 +28,7 @@ public class LoadData {
 	
 	public static final void executeScript() {
 		for(String s : lines) {
-			if(!s.equals(lines.get(0))) {
-				ReadScript.read(s);
-			}
+			ReadScript.read(s);
 		}
 	}
 	

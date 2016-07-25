@@ -39,10 +39,10 @@ public class ReadScript {
 					for(String s : cmd.args) {
 						arguments += s + ((s != cmd.args[cmd.args.length - 1]) ? ", " : "");
 					}
-					Nilplace.log("Command '" + cmd + "' requires " + cmd.args.length + " arguments: '" + arguments + "'.");
+					Nilplace.err("Command '" + cmd + "' requires " + cmd.args.length + " arguments: '" + arguments + "'.");
 				}
 			} else {
-				Nilplace.log("Command not found: '" + command + "'.");
+				Nilplace.err("Command not found: '" + command + "'.");
 			}
 		}
 	}

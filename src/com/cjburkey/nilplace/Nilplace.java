@@ -1,14 +1,27 @@
 package com.cjburkey.nilplace;
 
 import java.util.Map.Entry;
+import java.io.File;
 import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
 import javafx.application.Application;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 public class Nilplace extends Application {
 	
+	public static final String dir = System.getProperty("user.home") +
+			File.separator + "nilplace" + File.separator;
+	
 	private String downloadInfoFile = null;
+	
+	public static final String getAppDir() {
+		int num = ThreadLocalRandom.current().nextInt(0, 999999999 + 1);
+		if(!new File(dir, num + "").exists()) {
+			return dir + num;
+		}
+		return getAppDir();
+	}
 	
 	public static final void log(Object msg) {
 		log(msg, true);
