@@ -3,12 +3,15 @@ package com.cjburkey.nilplace.install;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 import com.cjburkey.nilplace.Nilplace;
 import com.cjburkey.nilplace.Prgm;
 import com.cjburkey.nilplace.file.CloneFile;
@@ -27,6 +30,7 @@ public class Progs {
 	
 	public static boolean cancel = false;
 	public static String dir = Nilplace.getAppDir();
+	public static final int bufferSize = 4 * 1024;
 	
 	private static boolean first = true;
 	private static int total = 0;
@@ -47,6 +51,7 @@ public class Progs {
 	
 	public static final void go() {
 		new Thread(() -> {
+			calcTotal();
 			download();
 			extract();
 			clones();
@@ -88,20 +93,20 @@ public class Progs {
 					new File(fi.getParent()).mkdirs();
 				}
 				
+				Platform.runLater(() -> {
+					Prgm.prg.setProgress(0);
+					Prgm.addStep("Download: " + fi.getName());
+				});
+				
 				HttpURLConnection httpConnection = (HttpURLConnection) (url.openConnection());
 				long completeFileSize = httpConnection.getContentLength();
 				BufferedInputStream bis = new BufferedInputStream(httpConnection.getInputStream());
 				FileOutputStream fos = new FileOutputStream(fi);
-				BufferedOutputStream bos = new BufferedOutputStream(fos, 1024);
+				BufferedOutputStream bos = new BufferedOutputStream(fos, bufferSize);
 				
-				Platform.runLater(() -> {
-					Prgm.prg.setProgress(0);
-					Prgm.currentFile.setText(fi.getName());
-				});
-				
-				byte[] data = new byte[1024];
+				byte[] data = new byte[bufferSize];
 				int x = 0;
-				while((x = bis.read(data, 0, 1024)) >= 0 && !cancel) {
+				while((x = bis.read(data, 0, bufferSize)) >= 0 && !cancel) {
 					downloadedFileSize += x;
 					Platform.runLater(() -> {
 						if(completeFileSize > 0) {
@@ -125,30 +130,123 @@ public class Progs {
 			Platform.runLater(() -> { fin(); Prgm.prg.setProgress(1); });
 			Nilplace.log("Done.");
 		}
-		Platform.runLater(() -> { Prgm.currentFile.setText(""); });
 	}
-	
+
+	private static float prev = -1;
 	private static final void extract() {
+		Platform.runLater(() -> { Prgm.addStep(""); });
 		for(ExtractFile f : extractions) {
-			calcTotal();
 			Nilplace.log("Extracting to '" + f.output + "' from '" + f.input + "'");
-			fin();
+			try {
+				Platform.runLater(() -> {
+					Prgm.prg.setProgress(0);
+					Prgm.addStep("Extract: " + new File(f.output).getName());
+				});
+				
+				FileInputStream stream = new FileInputStream(new File(dir, f.input));
+				ZipInputStream zis = new ZipInputStream(stream);
+				
+				byte[] buffer = new byte[bufferSize];
+				int length;
+				int finalSize = 0;
+				float current = 0;
+
+				finalSize = (int) new File(dir, f.input).length();
+				ZipEntry e = null;
+				while((e = zis.getNextEntry()) != null) {
+					current += e.getCompressedSize();
+					
+					File fi = new File(new File(dir, f.output), e.getName());
+					if(!fi.getParentFile().exists()) { fi.getParentFile().mkdirs(); }
+					
+					FileOutputStream fos = new FileOutputStream(fi);
+					while((length = zis.read(buffer)) > 0 && !cancel) {
+						fos.write(buffer, 0, length);
+					}
+					fos.close();
+					zis.closeEntry();
+					
+					if(prev != current / finalSize) {
+						prev = current / finalSize;
+						Platform.runLater(() -> { Prgm.prg.setProgress(prev); });
+					}
+					
+				}
+				
+				zis.close();
+				stream.close();
+				
+				if(cancel) {
+					Util.deleteDir(new File(dir));
+					break;
+				}
+			} catch(Exception e) {
+				Nilplace.err(e);
+			}
+			Platform.runLater(() -> { fin(); Prgm.prg.setProgress(1); });
+			Nilplace.log("Done.");
 		}
 	}
 	
+	private static int finalSize = 0;
+	private static float current = 0;
 	private static final void clones() {
+		Platform.runLater(() -> { Prgm.addStep(""); });
 		for(CloneFile f : clones) {
-			calcTotal();
 			Nilplace.log("Copying to '" + f.output + "' from '" + f.input + "'");
-			fin();
+			try {
+				if(!new File(dir, f.input).isDirectory()) {
+					Platform.runLater(() -> {
+						Prgm.prg.setProgress(0);
+						Prgm.addStep("Copy: " + new File(f.output).getName());
+					});
+					
+					FileInputStream fis = new FileInputStream(new File(dir, f.input));
+					FileOutputStream fos = new FileOutputStream(new File(dir, f.output));
+					
+					byte[] buffer = new byte[bufferSize];
+					
+					int length = 0;
+					
+					finalSize = (int) new File(dir, f.input).length();
+					
+					while((length = fis.read(buffer, 0, bufferSize)) >= 0 && !cancel) {
+						current += length;
+						
+						Platform.runLater(() -> {
+							Prgm.prg.setProgress((double) current / (double) finalSize);
+						});
+						
+						fos.write(buffer, 0, length);
+					}
+					
+					fos.close();
+					fis.close();
+				}
+				
+				if(cancel) {
+					Util.deleteDir(new File(dir));
+					break;
+				}
+			} catch(Exception e) {
+				Nilplace.err(e);
+			}
+			Platform.runLater(() -> { fin(); Prgm.prg.setProgress(1); });
+			Nilplace.log("Done.");
 		}
 	}
 	
 	private static final void delete() {
+		Platform.runLater(() -> { Prgm.addStep(""); });
 		for(DeleteFile f : deletions) {
-			calcTotal();
 			Nilplace.log("Deleting '" + f.delete + "'");
-			fin();
+			File fi = new File(dir, f.delete);
+			if(fi.isDirectory()) { Util.deleteDir(fi); }
+			else if(!fi.delete()) { fi.deleteOnExit(); }
+			Nilplace.log("Done.");
+			Platform.runLater(() -> {
+				fin(); Prgm.addStep("Delete: " + fi.getName()); Prgm.prg.setProgress(1);
+			});
 		}
 	}
 	

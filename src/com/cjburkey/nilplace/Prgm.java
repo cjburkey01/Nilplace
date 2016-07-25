@@ -24,14 +24,13 @@ public class Prgm {
 	public static ProgressBar prg;
 	public static ProgressBar total;
 	public static Label totalProg;
-	public static Label currentFile;
 	
 	public static final Scene launchInstaller(Stage s, String infoFileUrl) {
 		Nilplace.log("Launching installer.");
 		
 		BorderPane root = new BorderPane();
-		//VBox root = new VBox();
 		Scene scene = new Scene(root);
+		scene.getStylesheets().add("css/square.css");
 		Nilplace.log("Reading file.", false);
 		LoadData.load(infoFileUrl);
 		Nilplace.log("Finished reading file.", false);
@@ -62,6 +61,7 @@ public class Prgm {
 	private static final Scene startInstallScreen(Stage s) {
 		BorderPane root = new BorderPane();
 		Scene scene = new Scene(root);
+		scene.getStylesheets().add("css/square.css");
 		
 		HBox box = new HBox();
 		VBox center = new VBox();
@@ -141,12 +141,17 @@ public class Prgm {
 		loadingCancel.setDisable(true);
 	}
 	
+	public static final void addStep(String s) {
+		a.setText(s + ((!a.getText().trim().isEmpty()) ? "\n" : "") + a.getText());
+	}
+	
 	private static Button loadingGo;
 	private static Button loadingCancel;
+	private static TextArea a;
 	private static final Scene loadingScene(Stage s) {
 		BorderPane root = new BorderPane();
 		Scene scene = new Scene(root);
-		scene.getStylesheets().add("css/progBar.css");
+		scene.getStylesheets().add("css/square.css");
 		
 		Label top = new Label(LoadData.getName());
 		VBox center = new VBox();
@@ -157,16 +162,18 @@ public class Prgm {
 		total = new ProgressBar();
 		prg = new ProgressBar();
 		totalProg = new Label();
-		currentFile = new Label();
+		a = new TextArea();
 		
 		loadingGo.setDisable(true);
+		
+		a.setEditable(false);
 		
 		bottom.getChildren().addAll(loadingCancel, loadingGo);
 		bottom.setAlignment(Pos.CENTER_RIGHT);
 		bottom.setSpacing(10);
 		bottom.setPadding(new Insets(10));
 		
-		center.getChildren().addAll(totalProg, total, prg, currentFile);
+		center.getChildren().addAll(totalProg, total, prg, a);
 		center.setAlignment(Pos.CENTER);
 		center.setSpacing(10);
 		center.setPadding(new Insets(10));
@@ -191,6 +198,7 @@ public class Prgm {
 	private static final Scene done(Stage s) {
 		BorderPane root = new BorderPane();
 		Scene scene = new Scene(root);
+		scene.getStylesheets().add("css/square.css");
 		
 		Label top = new Label(LoadData.getName());
 		VBox center = new VBox();

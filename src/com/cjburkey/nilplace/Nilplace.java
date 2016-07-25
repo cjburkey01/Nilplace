@@ -1,10 +1,11 @@
 package com.cjburkey.nilplace;
 
-import java.util.Map.Entry;
 import java.io.File;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import javafx.application.Application;
+import javafx.scene.image.Image;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
@@ -72,6 +73,9 @@ public class Nilplace extends Application {
 		s.setTitle("Nilplace");
 		s.setResizable(false);
 		s.show();
+		s.getIcons().add(new Image("img/icon.png"));
+		
+		s.setOnCloseRequest(e -> { e.consume(); });
 		
 		log("Done.", false);
 	}
