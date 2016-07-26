@@ -61,7 +61,7 @@ public class Nilplace extends Application {
 		
 		if(downloadInfoFile == null) {
 			log("Didn't find main info file.");
-			s.setScene(Prgm.launchCreator(s));
+			s.setScene(Prgm.launchPrgm(s));
 		} else {
 			log("Found main info file.");
 			s.setScene(Prgm.launchInstaller(s, downloadInfoFile));
@@ -74,8 +74,6 @@ public class Nilplace extends Application {
 		s.setResizable(false);
 		s.show();
 		s.getIcons().add(new Image("img/icon.png"));
-		
-		s.setOnCloseRequest(e -> { e.consume(); });
 		
 		log("Done.", false);
 	}

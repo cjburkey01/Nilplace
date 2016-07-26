@@ -1,11 +1,11 @@
 /* PROGBAR */
 
 .progress-bar > .track {
-	-fx-background-radius: 0px 10px 0px 10px;
+	-fx-background-radius: 10px 2px;
 }
 
 .progress-bar > .bar {
-	-fx-background-radius: 0px 10px 0px 10px;
+	-fx-background-radius: 8px 2px;
 	-fx-background-color:
 		linear-gradient(to bottom,
 			rgb(200, 0, 0) 0%,

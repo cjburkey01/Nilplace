@@ -30,7 +30,7 @@ public class Progs {
 	
 	public static boolean cancel = false;
 	public static String dir = Nilplace.getAppDir();
-	public static final int bufferSize = 4 * 1024;
+	public static final int bufferSize = 2 * 1024;
 	
 	private static boolean first = true;
 	private static int total = 0;
@@ -43,9 +43,14 @@ public class Progs {
 		}
 	}
 	
+	private static final void updateTotalBar() {
+		Prgm.total.setProgress((Prgm.prg.getProgress() / (double) total) +
+				((double) through / (double) total));
+	}
+	
 	private static final void fin() {
+		updateTotalBar();
 		through ++;
-		Prgm.total.setProgress((double) through / (double) total);
 		Prgm.totalProg.setText(through + " / " + total);
 	}
 	
@@ -81,7 +86,6 @@ public class Progs {
 	
 	private static long downloadedFileSize = 0;
 	private static final void download() {
-		calcTotal();
 		for(DownFile f : downloads) {
 			downloadedFileSize = 0;
 			Nilplace.log("Downloading to '" + f.file + "' from '" + f.url + "'");
@@ -100,7 +104,8 @@ public class Progs {
 				
 				HttpURLConnection httpConnection = (HttpURLConnection) (url.openConnection());
 				long completeFileSize = httpConnection.getContentLength();
-				BufferedInputStream bis = new BufferedInputStream(httpConnection.getInputStream());
+				BufferedInputStream bis =
+						new BufferedInputStream(httpConnection.getInputStream());
 				FileOutputStream fos = new FileOutputStream(fi);
 				BufferedOutputStream bos = new BufferedOutputStream(fos, bufferSize);
 				
@@ -110,7 +115,9 @@ public class Progs {
 					downloadedFileSize += x;
 					Platform.runLater(() -> {
 						if(completeFileSize > 0) {
-							Prgm.prg.setProgress((double) downloadedFileSize / (double) completeFileSize);
+							Prgm.prg.setProgress((double) downloadedFileSize /
+									(double) completeFileSize);
+							updateTotalBar();
 						}
 					});
 					bos.write(data, 0, x);
@@ -168,7 +175,8 @@ public class Progs {
 					
 					if(prev != current / finalSize) {
 						prev = current / finalSize;
-						Platform.runLater(() -> { Prgm.prg.setProgress(prev); });
+						Platform.runLater(() -> { Prgm.prg.setProgress(prev);
+							updateTotalBar(); });
 					}
 					
 				}
@@ -215,6 +223,7 @@ public class Progs {
 						
 						Platform.runLater(() -> {
 							Prgm.prg.setProgress((double) current / (double) finalSize);
+							updateTotalBar();
 						});
 						
 						fos.write(buffer, 0, length);
