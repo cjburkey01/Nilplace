@@ -4,6 +4,8 @@ import java.io.File;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
+import com.cjburkey.nilplace.scene.LaunchInstaller;
+import com.cjburkey.nilplace.scene.LaunchPrgm;
 import javafx.application.Application;
 import javafx.scene.image.Image;
 import javafx.stage.Screen;
@@ -61,10 +63,10 @@ public class Nilplace extends Application {
 		
 		if(downloadInfoFile == null) {
 			log("Didn't find main info file.");
-			s.setScene(Prgm.launchPrgm(s));
+			s.setScene(LaunchPrgm.go(s));
 		} else {
 			log("Found main info file.");
-			s.setScene(Prgm.launchInstaller(s, downloadInfoFile));
+			s.setScene(LaunchInstaller.go(s, downloadInfoFile));
 		}
 		
 		s.setWidth(Screen.getPrimary().getVisualBounds().getWidth() / 2);
