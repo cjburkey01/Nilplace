@@ -1,11 +1,8 @@
 package com.cjburkey.nilplace.scene;
 
-import com.cjburkey.nilplace.file.CloneFile;
-import com.cjburkey.nilplace.file.DeleteFile;
-import com.cjburkey.nilplace.file.DownFile;
-import com.cjburkey.nilplace.file.ExtractFile;
+import com.cjburkey.nilplace.file.WorkerFile;
 import com.cjburkey.nilplace.install.LoadData;
-import com.cjburkey.nilplace.install.Progs;
+import com.cjburkey.nilplace.install.Worker;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -38,39 +35,9 @@ public class StartInstallScreen {
 		te.setEditable(false);
 		
 		te.appendText("Downloads:\n");
-		if(Progs.downloads.size() > 0) {
-			for(DownFile f : Progs.downloads) {
-				te.appendText("\t- " + f.url + "\n");
-			}
-		} else {
-			te.appendText("\t- None\n");
-		}
-		
-		te.appendText("\nExtractions:\n");
-		if(Progs.extractions.size() > 0) {
-			for(ExtractFile f : Progs.extractions) {
-				te.appendText("\t- " + f.input + "\n");
-			}
-		} else {
-			te.appendText("\t- None\n");
-		}
-		
-		te.appendText("\nFile copies:\n");
-		if(Progs.clones.size() > 0) {
-			for(CloneFile f : Progs.clones) {
-				te.appendText("\t- " + f.input + "\n");
-			}
-		} else {
-			te.appendText("\t- None\n");
-		}
-		
-		te.appendText("\nFile deletions:\n");
-		if(Progs.deletions.size() > 0) {
-			for(DeleteFile f : Progs.deletions) {
-				te.appendText("\t- " + f.delete + "\n");
-			}
-		} else {
-			te.appendText("\t- None\n");
+		for(WorkerFile f : Worker.workers) {
+			te.appendText("\t- " + f.a + ": " + f.args +
+					((f.equals(Worker.workers.get(Worker.workers.size() - 1))) ? "" : "\n"));
 		}
 		
 		box.getChildren().addAll(cancel, go);

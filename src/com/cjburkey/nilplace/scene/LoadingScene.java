@@ -2,7 +2,7 @@ package com.cjburkey.nilplace.scene;
 
 import com.cjburkey.nilplace.Prgm;
 import com.cjburkey.nilplace.install.LoadData;
-import com.cjburkey.nilplace.install.Progs;
+import com.cjburkey.nilplace.install.Worker;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -57,10 +57,10 @@ public class LoadingScene {
 		root.setCenter(center);
 		root.setBottom(bottom);
 		
-		Prgm.loadingCancel.setOnAction(e -> { Progs.cancel = true; Platform.exit(); });
+		Prgm.loadingCancel.setOnAction(e -> { Worker.cancel = true; Platform.exit(); });
 		Prgm.loadingGo.setOnAction(e -> { s.setScene(Done.go(s)); });
 		
-		Progs.go();
+		Worker.go();
 		
 		return scene;
 	}

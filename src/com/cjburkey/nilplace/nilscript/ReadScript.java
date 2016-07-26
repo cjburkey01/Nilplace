@@ -1,7 +1,9 @@
 package com.cjburkey.nilplace.nilscript;
 
 import com.cjburkey.nilplace.Nilplace;
+import com.cjburkey.nilplace.file.WorkerFile;
 import com.cjburkey.nilplace.install.InstallerAction;
+import com.cjburkey.nilplace.install.Worker;
 
 public class ReadScript {
 	
@@ -33,7 +35,8 @@ public class ReadScript {
 			if(InstallerAction.hasKey(command)) {
 				InstallerAction cmd = InstallerAction.valueOf(command);
 				if(args.length == cmd.args.length) {
-					cmd.action.call(args);
+					//cmd.action.call(args);
+					Worker.workers.add(new WorkerFile(cmd, args));
 				} else {
 					String arguments = "";
 					for(String s : cmd.args) {
