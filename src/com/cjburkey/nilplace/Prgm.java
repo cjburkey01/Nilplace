@@ -23,7 +23,19 @@ public class Prgm {
 	}
 	
 	public static final void addStep(String s) {
-		a.setText(s + ((!a.getText().trim().isEmpty()) ? "\n" : "") + a.getText());
+		addStep(s, false);
+	}
+	
+	public static final void addStep(String s, boolean addToLastLine) {
+		if(addToLastLine) {
+			String[] split = a.getText().split("\n");
+			split[0] += s;
+			String done = "";
+			for(String add : split) { done += add + "\n"; }
+			a.setText(done);
+		} else {
+			a.setText(s + "\n" + a.getText());
+		}
 	}
 	
 }

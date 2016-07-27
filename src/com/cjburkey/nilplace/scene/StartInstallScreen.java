@@ -1,9 +1,9 @@
 package com.cjburkey.nilplace.scene;
 
+import com.cjburkey.nilplace.Nilplace;
 import com.cjburkey.nilplace.file.WorkerFile;
 import com.cjburkey.nilplace.install.LoadData;
 import com.cjburkey.nilplace.install.Worker;
-import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -34,9 +34,13 @@ public class StartInstallScreen {
 		te.setWrapText(false);
 		te.setEditable(false);
 		
-		te.appendText("Downloads:\n");
+		te.appendText("Commands:\n");
 		for(WorkerFile f : Worker.workers) {
-			te.appendText("\t- " + f.a + ": " + f.args +
+			String args = "";
+			for(String st : f.args) {
+				args += st + ((st.equals(f.args[f.args.length - 1])) ? "" : ", ");
+			}
+			te.appendText("\t- " + f.a + ": [" + args + "]" + 
 					((f.equals(Worker.workers.get(Worker.workers.size() - 1))) ? "" : "\n"));
 		}
 		
@@ -56,7 +60,7 @@ public class StartInstallScreen {
 		root.setBottom(box);
 		root.setCenter(center);
 		
-		cancel.setOnAction(e -> { go.setDisable(true); Platform.exit(); });
+		cancel.setOnAction(e -> { go.setDisable(true); Nilplace.resetScene(); });
 		go.setOnAction(e -> { s.setScene(LoadingScene.go(s)); });
 		
 		te.setScrollTop(0);

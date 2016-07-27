@@ -1,13 +1,23 @@
 package com.cjburkey.nilplace;
 
 import java.io.File;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.net.URL;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import com.cjburkey.nilplace.scene.LaunchInstaller;
 import com.cjburkey.nilplace.scene.LaunchPrgm;
 import javafx.application.Application;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Priority;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
@@ -17,6 +27,11 @@ public class Nilplace extends Application {
 			File.separator + "nilplace" + File.separator;
 	
 	private String downloadInfoFile = null;
+	private static Stage stage;
+	
+	public static final void resetScene() {
+		stage.setScene(LaunchPrgm.go(stage));
+	}
 	
 	public static final String getAppDir() {
 		int num = ThreadLocalRandom.current().nextInt(0, 999999999 + 1);
@@ -38,15 +53,52 @@ public class Nilplace extends Application {
 		System.err.println(msg);
 	}
 	
-	public static final void err(Throwable t) {
+	public static final void err(Throwable t, boolean display) {
 		err("An error occurred!");
 		err("Main error: '" + t.getMessage() + "'");
 		err("--[ BEGIN ERR REPORT STACKTRACE ]--");
 		t.printStackTrace();
 		err("--[ END ERR REPORT STACKTRACE ]--");
+		
+		if(display) {
+			Alert alert = new Alert(AlertType.ERROR);
+			alert.setTitle("An error occurred!");
+			alert.setHeaderText("Click \"Show Details\" to view the throwable stacktace.");
+			alert.setContentText(t.getMessage());
+			
+			StringWriter sw = new StringWriter();
+			PrintWriter pw = new PrintWriter(sw);
+			t.printStackTrace(pw);
+			String exceptionText = sw.toString();
+
+			Label label = new Label("Stacktrace:");
+			
+			TextArea textArea = new TextArea(exceptionText);
+			textArea.setEditable(false);
+			textArea.setWrapText(true);
+
+			textArea.setMaxWidth(Double.MAX_VALUE);
+			textArea.setMaxHeight(Double.MAX_VALUE);
+			GridPane.setVgrow(textArea, Priority.ALWAYS);
+			GridPane.setHgrow(textArea, Priority.ALWAYS);
+
+			BorderPane expContent = new BorderPane();
+			expContent.setMaxWidth(Double.MAX_VALUE);
+			expContent.setCenter(textArea);
+			expContent.setTop(label);
+			
+			alert.getDialogPane().setExpandableContent(expContent);
+
+			alert.showAndWait();
+		}
+	}
+	
+	public static final void err(Throwable e) {
+		err(e, true);
 	}
 	
 	public void start(Stage s) {
+		stage = s;
 		Thread.setDefaultUncaughtExceptionHandler((t, e) -> { err(e); });
 		
 		Parameters ps = this.getParameters();
@@ -83,6 +135,13 @@ public class Nilplace extends Application {
 	public static void main(String[] args) {
 		log("Launching", false);
 		launch(args);
+	}
+	
+	public static final void install(Stage s, String durl) {
+		try {
+			new URL(durl);
+			s.setScene(LaunchInstaller.go(s, durl));
+		} catch(Exception e) { err(e); }
 	}
 	
 }

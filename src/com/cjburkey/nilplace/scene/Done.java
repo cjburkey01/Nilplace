@@ -1,7 +1,7 @@
 package com.cjburkey.nilplace.scene;
 
+import com.cjburkey.nilplace.Nilplace;
 import com.cjburkey.nilplace.install.LoadData;
-import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -41,7 +41,7 @@ public class Done {
 		root.setCenter(center);
 		root.setBottom(bottom);
 		
-		finish.setOnAction(e -> { finish.setDisable(true); Platform.exit(); });
+		finish.setOnAction(e -> { Nilplace.resetScene(); });
 		
 		return scene;
 	}

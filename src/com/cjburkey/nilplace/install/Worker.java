@@ -23,7 +23,6 @@ public class Worker {
 	public static final void calcTotal() {
 		if(first) {
 			first = false;
-			//total = downloads.size() + extractions.size() + clones.size() + deletions.size();
 			total = workers.size();
 			Prgm.total.setProgress(0);
 		}
@@ -44,7 +43,9 @@ public class Worker {
 		new Thread(() -> {
 			calcTotal();
 			for(WorkerFile f : workers) {
-				f.a.action.call(f.args);
+				if(!cancel) {
+					f.a.action.call(f.args);
+				}
 			}
 			if(!cancel) { writeInfo(); }
 			Prgm.done();
@@ -59,8 +60,8 @@ public class Worker {
 			f.createNewFile();
 			FileWriter writer = new FileWriter(f, true);
 			
-			writer.append(new File(dir).getName() + ";\n");
-			writer.append(LoadData.getName() + ";");
+			writer.append(new File(dir).getName() + "\n");
+			writer.append(LoadData.getName() + "");
 			
 			writer.close();
 		} catch(Exception e) {

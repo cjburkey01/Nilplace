@@ -19,38 +19,46 @@ public enum InstallerAction {
 	Download((args) -> {
 		String url = args[0].trim();
 		String loc = args[1].trim();
+
+		Platform.runLater(() -> { Prgm.addStep("Downloading: '" + loc + "'"); });
 		
 		download(url, loc);
 		
-		Platform.runLater(() -> { Prgm.addStep("Downloaded: '" + loc + "'"); });
+		Platform.runLater(() -> { Prgm.addStep("     ..Done", true); });
 	}, "URL", "Location"),
 	
 	Extract((args) -> {
 		String original = args[0].trim();
 		String folder = args[1].trim();
 		
+		Platform.runLater(() -> {
+			Prgm.addStep("Extracting: '" + original + "' to '" + folder + "'"); });
+		
 		extract(original, folder);
 		
-		Platform.runLater(() -> {
-			Prgm.addStep("Extracted: '" + original + "' to '" + folder + "'"); });
+		Platform.runLater(() -> { Prgm.addStep("     ..Done", true); });
 	}, "Location", "Output"),
 	
 	Clone((args) -> {
 		String original = args[0].trim();
 		String copy = args[1].trim();
+
+		Platform.runLater(() -> {
+			Prgm.addStep("Copying: '" + original + "' to '" + copy + "'"); });
 		
 		copy(original, copy);
-
-		Platform.runLater(() -> { Prgm.addStep("Copied: '" + original + "' to '" + copy + "'"); });
+		
+		Platform.runLater(() -> { Prgm.addStep("     ..Done", true); });
 	}, "Original", "Duplicate"),
 	
 	Delete((args) -> {
 		String file = args[0].trim();
 		File f = new File(file);
+		Platform.runLater(() -> { Worker.fin(); Prgm.addStep("Deleting: '" + file + "'"); });
 		if(!f.delete()) {
 			f.deleteOnExit();
 		}
-		Platform.runLater(() -> { Prgm.addStep("Deleted: '" + file + "'"); });
+		Platform.runLater(() -> { Prgm.addStep("     ..Done", true); });
 	}, "File");
 
 	public Action action;

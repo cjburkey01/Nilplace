@@ -4,24 +4,18 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
-import java.io.InputStream;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
+import com.cjburkey.nilplace.InstallerInfo;
 import com.cjburkey.nilplace.Nilplace;
-import com.cjburkey.nilplace.Prgm;
 import com.cjburkey.nilplace.install.InstallerAction;
-import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TextArea;
@@ -38,20 +32,31 @@ import javafx.stage.Stage;
 
 public class LaunchPrgm {
 	
-	private static final TextArea code = new TextArea();
+	private static TextArea code;
 	private static final List<Button> buttons = new ArrayList<Button>();
+	
+	public static TabPane pane;
+	public static ListView<InstallerInfo> list;
 	
 	public static final Scene go(Stage s) {
 		Nilplace.log("Launching program.");
 		BorderPane root = new BorderPane();
 		Scene scene = new Scene(root);
 		
+		s.setOnCloseRequest(e -> {  });
+		
 		Tab myPrograms = new Tab("Installed Programs", tabList());
-		Tab install = new Tab("Install New Program", tabInstall());
+		Tab install = new Tab("Install New Program", tabInstall(s));
 		Tab create = new Tab("Create Installer", tabCreate(s));
 		
-		TabPane pane = new TabPane();
+		pane = new TabPane();
 		pane.getTabs().addAll(myPrograms, install, create);
+		pane.getSelectionModel().selectedIndexProperty().addListener(e -> {
+			if(pane.getSelectionModel().getSelectedIndex() == 0) {
+				list.getItems().clear();
+				list.getItems().addAll(InstallerInfo.reloadViews());
+			}
+		});
 		
 		for(Tab t : pane.getTabs()) {
 			t.setClosable(false);
@@ -66,89 +71,49 @@ public class LaunchPrgm {
 	private static final Node tabList() {
 		VBox programs = new VBox();
 		
+		list = new ListView<InstallerInfo>();
+		list.getItems().addAll(InstallerInfo.reloadViews());
+		
+		list.setOnMouseClicked(e -> {
+			int count = e.getClickCount();
+			InstallerInfo v = list.getSelectionModel().getSelectedItem();
+			if(v != null && count == 2) {
+				int id = v.id;
+				Nilplace.log("Application id: " + id);
+			}
+		});
+		
 		programs.setPadding(new Insets(10));
 		programs.setSpacing(10);
+		programs.getChildren().addAll(list);
 		
 		return programs;
 	}
 	
-	private static final Node tabInstall() {
+	private static final Node tabInstall(Stage s) {
 		VBox inst = new VBox();
 		
+		Button loadFromFile = new Button("Install From File");
 		TextField url = new TextField();
 		Button start = new Button("Install");
 		
 		inst.setPadding(new Insets(10));
 		inst.setSpacing(10);
 		inst.setAlignment(Pos.CENTER);
-		inst.getChildren().addAll(url, start);
+		inst.getChildren().addAll(loadFromFile, url, start);
 		url.setPromptText("URL of Installation Information File.");
-		start.setOnAction(e -> {
-			start.setDisable(true);
-			if(!Prgm.installer.exists()) {
-				Dialog<Integer> d = new Dialog<Integer>();
-				d.setTitle("Downloading...");
-				d.setContentText("Please wait while Nilplace updates the installer file.");
-				d.getDialogPane().getButtonTypes().clear();
-				new Thread(() -> {
-					try {
-						URL u = new URL("http://cjburkey.com/nilplace.jar");
-						InputStream in = u.openStream();
-						
-						Nilplace.log("Starting installer update.");
-						Files.copy(in, Prgm.installer.toPath(),
-								StandardCopyOption.REPLACE_EXISTING);
-						Platform.runLater(() -> { d.setResult(0); d.close(); });
-						Nilplace.log("Done.");
-						
-						in.close();
-					} catch(Exception err) {
-						Nilplace.err(err);
-					}
-				}).start();
-				d.show();
+		start.setOnAction(e -> { Nilplace.install(s, url.getText()); });
+		loadFromFile.setOnAction(e -> {
+			FileChooser fc = new FileChooser();
+			fc.setTitle("Open Installer");
+			fc.getExtensionFilters().addAll(
+				new ExtensionFilter("Nilscript Files", "*.ns"),
+				new ExtensionFilter("All Files", "*.*")
+			);
+			File f = fc.showOpenDialog(s);
+			if(f != null) {
+				url.setText("file://" + f.getAbsolutePath());
 			}
-			
-			Dialog<Integer> d = new Dialog<Integer>();
-			d.setTitle("Loading...");
-			d.setContentText("Loading installer.");
-			d.getDialogPane().getButtonTypes().clear();
-			new Thread(() -> {
-				try {
-					ProcessBuilder b = new ProcessBuilder(new String[] {
-							"java", "-jar", Prgm.installer + "", "--downloadInfoFile=" +
-									url.getText() });
-					Platform.runLater(() -> { d.show(); });
-					Process p = b.start();
-					
-					new Thread(() -> {
-						Scanner s = new Scanner(p.getInputStream());
-						while(s.hasNextLine()) {
-							System.out.println("Installer: " + s.nextLine());
-						}
-						s.close();
-					}).start();
-					
-					new Thread(() -> {
-						Scanner s = new Scanner(p.getErrorStream());
-						while(s.hasNextLine()) {
-							System.out.println("Installer error: " + s.nextLine());
-						}
-						s.close();
-					}).start();
-					
-					p.waitFor();
-					
-					Platform.runLater(() -> {
-						d.setResult(0);
-						d.close();
-						url.clear();
-						start.setDisable(false);
-					});
-				} catch(Exception err) {
-					Nilplace.err(err);
-				}
-			}).start();
 		});
 		
 		return inst;
@@ -166,6 +131,7 @@ public class LaunchPrgm {
 		Label la = new Label("File: ");
 		Button save = new Button("Save");
 		Button load = new Button("Load");
+		code = new TextArea();
 		ToolBar toolb = new ToolBar();
 		toolb.getItems().addAll(l);
 		toolb.getItems().addAll(buttons);
