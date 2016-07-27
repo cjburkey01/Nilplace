@@ -8,20 +8,24 @@ import java.util.ArrayList;
 import java.util.List;
 import com.cjburkey.nilplace.InstallerInfo;
 import com.cjburkey.nilplace.Nilplace;
+import com.cjburkey.nilplace.file.Util;
 import com.cjburkey.nilplace.install.InstallerAction;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToolBar;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -30,7 +34,7 @@ import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-public class LaunchPrgm {
+public class LaunchMain {
 	
 	private static TextArea code;
 	private static final List<Button> buttons = new ArrayList<Button>();
@@ -68,18 +72,38 @@ public class LaunchPrgm {
 		return scene;
 	}
 	
+	private static InstallerInfo v = null;
 	private static final Node tabList() {
 		VBox programs = new VBox();
 		
 		list = new ListView<InstallerInfo>();
 		list.getItems().addAll(InstallerInfo.reloadViews());
 		
+		MenuItem launch = new MenuItem("Launch Program");
+		MenuItem delete = new MenuItem("Delete Program");
+		ContextMenu m = new ContextMenu(launch, delete);
+		
+		delete.setOnAction(e -> {
+			if(v != null) {
+				File f = new File(Nilplace.dir, v.id + "");
+				Util.deleteDir(f);
+				Nilplace.resetScene(null);
+			}
+		});
+		
 		list.setOnMouseClicked(e -> {
 			int count = e.getClickCount();
-			InstallerInfo v = list.getSelectionModel().getSelectedItem();
-			if(v != null && count == 2) {
+			v = list.getSelectionModel().getSelectedItem();
+			if(v != null) {
 				int id = v.id;
 				Nilplace.log("Application id: " + id);
+				if(count == 2 && e.getButton().equals(MouseButton.PRIMARY)) {
+					
+				} else if(count == 1 && e.getButton().equals(MouseButton.SECONDARY)) {
+					m.show(list, e.getScreenX(), e.getScreenY());
+				} else if(count == 1 && e.getButton().equals(MouseButton.PRIMARY)) {
+					if(m.isShowing()) m.hide();
+				}
 			}
 		});
 		

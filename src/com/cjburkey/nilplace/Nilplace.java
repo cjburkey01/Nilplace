@@ -8,7 +8,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import com.cjburkey.nilplace.scene.LaunchInstaller;
-import com.cjburkey.nilplace.scene.LaunchPrgm;
+import com.cjburkey.nilplace.scene.LaunchMain;
 import javafx.application.Application;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -27,10 +27,16 @@ public class Nilplace extends Application {
 			File.separator + "nilplace" + File.separator;
 	
 	private String downloadInfoFile = null;
-	private static Stage stage;
+	public static Stage stage;
 	
-	public static final void resetScene() {
-		stage.setScene(LaunchPrgm.go(stage));
+	public static final void resetScene(String error) {
+		stage.setScene(LaunchMain.go(stage));
+		if(error != null) {
+			Alert a = new Alert(AlertType.ERROR);
+			a.setTitle("An error occurred!");
+			a.setContentText(error);
+			a.showAndWait();
+		}
 	}
 	
 	public static final String getAppDir() {
@@ -115,7 +121,7 @@ public class Nilplace extends Application {
 		
 		if(downloadInfoFile == null) {
 			log("Didn't find main info file.");
-			s.setScene(LaunchPrgm.go(s));
+			s.setScene(LaunchMain.go(s));
 		} else {
 			log("Found main info file.");
 			s.setScene(LaunchInstaller.go(s, downloadInfoFile));

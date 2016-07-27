@@ -45,12 +45,12 @@ public class LaunchInstaller {
 				root.setCenter(text);
 				root.setBottom(box);
 				
-				cancel.setOnAction(e -> { go.setDisable(true); Nilplace.resetScene(); });
+				cancel.setOnAction(e -> { Nilplace.resetScene(null); });
 				go.setOnAction(e -> { LoadData.executeScript(); s.setScene(StartInstallScreen.go(s)); });
 				return scene;
 			}
 		}
-		return LaunchPrgm.go(s);
+		return LaunchMain.go(s);
 	}
 	
 }

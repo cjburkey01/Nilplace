@@ -41,7 +41,7 @@ public class Done {
 		root.setCenter(center);
 		root.setBottom(bottom);
 		
-		finish.setOnAction(e -> { Nilplace.resetScene(); });
+		finish.setOnAction(e -> { Nilplace.resetScene(null); });
 		
 		return scene;
 	}

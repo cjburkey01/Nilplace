@@ -57,7 +57,7 @@ public class LoadingScene {
 		root.setCenter(center);
 		root.setBottom(bottom);
 		
-		Prgm.loadingCancel.setOnAction(e -> { Worker.cancel = true; Nilplace.resetScene(); });
+		Prgm.loadingCancel.setOnAction(e -> { Worker.cancel = true; Nilplace.resetScene(null); });
 		Prgm.loadingGo.setOnAction(e -> { s.setScene(Done.go(s)); });
 		
 		Worker.go();

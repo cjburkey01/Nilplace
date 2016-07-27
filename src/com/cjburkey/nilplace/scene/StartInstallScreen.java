@@ -60,7 +60,7 @@ public class StartInstallScreen {
 		root.setBottom(box);
 		root.setCenter(center);
 		
-		cancel.setOnAction(e -> { go.setDisable(true); Nilplace.resetScene(); });
+		cancel.setOnAction(e -> { Nilplace.resetScene(null); });
 		go.setOnAction(e -> { s.setScene(LoadingScene.go(s)); });
 		
 		te.setScrollTop(0);

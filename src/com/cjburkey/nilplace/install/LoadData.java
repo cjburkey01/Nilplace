@@ -46,19 +46,21 @@ public class LoadData {
 			Nilplace.log(url + " - " + p.keySet());
 			if((name = p.getProperty("programName")) == null) {
 				Nilplace.err("No name found.  Not installing.");
-				Nilplace.resetScene();
+				Nilplace.resetScene("No installer name found.  Not installing.");
+				return false;
 			}
 			winLaunch = p.getProperty("winLaunch");
 			macLaunch = p.getProperty("macLaunch");
 			linLaunch = p.getProperty("linLaunch");
 			if(winLaunch == null && macLaunch == null && linLaunch == null) {
 				Nilplace.err("No valid launch found.  Not installing.");
-				Nilplace.resetScene();
+				Nilplace.resetScene("No valid launch method found.  Not installing.");
+				return false;
 			}
 			return true;
 		} catch(Exception e) {
 			Nilplace.err(e);
-			Nilplace.resetScene();
+			Nilplace.resetScene("There was an error finding information on the installer.");
 		}
 		return false;
 	}
