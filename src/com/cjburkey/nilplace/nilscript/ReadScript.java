@@ -4,6 +4,7 @@ import com.cjburkey.nilplace.Nilplace;
 import com.cjburkey.nilplace.file.WorkerFile;
 import com.cjburkey.nilplace.install.InstallerAction;
 import com.cjburkey.nilplace.install.Worker;
+import com.cjburkey.nilplace.local.Localization;
 
 public class ReadScript {
 	
@@ -42,10 +43,11 @@ public class ReadScript {
 					for(String s : cmd.args) {
 						arguments += s + ((s != cmd.args[cmd.args.length - 1]) ? ", " : "");
 					}
-					Nilplace.err("Command '" + cmd + "' requires " + cmd.args.length + " arguments: '" + arguments + "'.");
+					Nilplace.err(Localization.getLocalized("missingArguments", cmd,
+							cmd.args.length, arguments));
 				}
 			} else {
-				Nilplace.err("Command not found: '" + command + "'.");
+				Nilplace.err(Localization.getLocalized("cmdNotFound", command));
 			}
 		}
 	}

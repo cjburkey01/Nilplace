@@ -7,6 +7,7 @@ import java.util.List;
 import com.cjburkey.nilplace.Nilplace;
 import com.cjburkey.nilplace.Prgm;
 import com.cjburkey.nilplace.file.WorkerFile;
+import com.cjburkey.nilplace.local.Localization;
 
 public class Worker {
 	
@@ -53,7 +54,7 @@ public class Worker {
 	}
 	
 	private static final void writeInfo() {
-		Nilplace.log("Writing program information.", false);
+		Nilplace.log(Localization.getLocalized("writingInfo"), false);
 		File f = new File(dir, "prgm.info");
 		try {
 			f.delete();
@@ -67,7 +68,7 @@ public class Worker {
 		} catch(Exception e) {
 			Nilplace.err(e);
 		}
-		Nilplace.log("Done.", false);
+		Nilplace.log(Localization.getLocalized("done"), false);
 	}
 	
 }

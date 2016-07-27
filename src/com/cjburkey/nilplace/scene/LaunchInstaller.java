@@ -1,7 +1,9 @@
 package com.cjburkey.nilplace.scene;
 
 import com.cjburkey.nilplace.Nilplace;
+import com.cjburkey.nilplace.OS;
 import com.cjburkey.nilplace.install.LoadData;
+import com.cjburkey.nilplace.local.Localization;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -21,17 +23,24 @@ public class LaunchInstaller {
 		BorderPane root = new BorderPane();
 		Scene scene = new Scene(root);
 		scene.getStylesheets().add("css/square.css");
-		Nilplace.log("Reading file.", false);
+		Nilplace.log(Localization.getLocalized("readingFile"), false);
 		if(LoadData.load(infoFileUrl)) {
 			if(LoadData.getName() != null) {
-				Nilplace.log("Finished reading file.", false);
+				Nilplace.log(Localization.getLocalized("finishReadingFile"), false);
+				
+				if((LoadData.winLaunch == null && OS.current.equals(OS.WIN)) || 
+						(LoadData.macLaunch == null && OS.current.equals(OS.MAC)) ||
+						(LoadData.linLaunch == null && OS.current.equals(OS.LIN))) {
+					Nilplace.resetScene(Localization.getLocalized("noOs", OS.current));
+					return null;
+				}
 				
 				HBox box = new HBox();
 				
-				Label text = new Label("The following installer will install '" +
-						LoadData.getName() +"'");
-				Button go = new Button("Continue");
-				Button cancel = new Button("Cancel");
+				Label text = new Label(Localization.getLocalized("installerShow",
+						LoadData.getName()));
+				Button go = new Button(Localization.getLocalized("continue"));
+				Button cancel = new Button(Localization.getLocalized("cancel"));
 				
 				box.getChildren().addAll(cancel, go);
 				box.setSpacing(10);
@@ -46,7 +55,8 @@ public class LaunchInstaller {
 				root.setBottom(box);
 				
 				cancel.setOnAction(e -> { Nilplace.resetScene(null); });
-				go.setOnAction(e -> { LoadData.executeScript(); s.setScene(StartInstallScreen.go(s)); });
+				go.setOnAction(e -> { LoadData.executeScript();
+					s.setScene(StartInstallScreen.go(s)); });
 				return scene;
 			}
 		}

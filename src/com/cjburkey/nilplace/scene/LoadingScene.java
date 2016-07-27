@@ -4,6 +4,7 @@ import com.cjburkey.nilplace.Nilplace;
 import com.cjburkey.nilplace.Prgm;
 import com.cjburkey.nilplace.install.LoadData;
 import com.cjburkey.nilplace.install.Worker;
+import com.cjburkey.nilplace.local.Localization;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -27,8 +28,8 @@ public class LoadingScene {
 		VBox center = new VBox();
 		HBox bottom = new HBox();
 		
-		Prgm.loadingCancel = new Button("Cancel");
-		Prgm.loadingGo = new Button("Continue");
+		Prgm.loadingCancel = new Button(Localization.getLocalized("cancel"));
+		Prgm.loadingGo = new Button(Localization.getLocalized("continue"));
 		Prgm.total = new ProgressBar();
 		Prgm.prg = new ProgressBar();
 		Prgm.totalProg = new Label();

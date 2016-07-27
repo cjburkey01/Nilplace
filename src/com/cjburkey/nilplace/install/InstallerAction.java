@@ -12,6 +12,7 @@ import java.util.zip.ZipInputStream;
 import com.cjburkey.nilplace.Nilplace;
 import com.cjburkey.nilplace.Prgm;
 import com.cjburkey.nilplace.file.Util;
+import com.cjburkey.nilplace.local.Localization;
 import javafx.application.Platform;
 
 public enum InstallerAction {
@@ -20,11 +21,12 @@ public enum InstallerAction {
 		String url = args[0].trim();
 		String loc = args[1].trim();
 
-		Platform.runLater(() -> { Prgm.addStep("Downloading: '" + loc + "'"); });
+		Platform.runLater(() -> { Prgm.addStep(Localization.getLocalized("downloading", loc)); });
 		
 		download(url, loc);
 		
-		Platform.runLater(() -> { Prgm.addStep("     ..Done", true); });
+		Platform.runLater(() -> { Prgm.addStep("     .." +
+				Localization.getLocalized("done"), true); });
 	}, "URL", "Location"),
 	
 	Extract((args) -> {
@@ -32,11 +34,12 @@ public enum InstallerAction {
 		String folder = args[1].trim();
 		
 		Platform.runLater(() -> {
-			Prgm.addStep("Extracting: '" + original + "' to '" + folder + "'"); });
+			Prgm.addStep(Localization.getLocalized("extracting", original)); });
 		
 		extract(original, folder);
 		
-		Platform.runLater(() -> { Prgm.addStep("     ..Done", true); });
+		Platform.runLater(() -> { Prgm.addStep("     .." +
+				Localization.getLocalized("done"), true); });
 	}, "Location", "Output"),
 	
 	Clone((args) -> {
@@ -44,21 +47,23 @@ public enum InstallerAction {
 		String copy = args[1].trim();
 
 		Platform.runLater(() -> {
-			Prgm.addStep("Copying: '" + original + "' to '" + copy + "'"); });
+			Prgm.addStep(Localization.getLocalized("copying", original, copy)); });
 		
 		copy(original, copy);
 		
-		Platform.runLater(() -> { Prgm.addStep("     ..Done", true); });
+		Platform.runLater(() -> { Prgm.addStep("     .." +
+				Localization.getLocalized("done"), true); });
 	}, "Original", "Duplicate"),
 	
 	Delete((args) -> {
 		String file = args[0].trim();
 		File f = new File(file);
-		Platform.runLater(() -> { Worker.fin(); Prgm.addStep("Deleting: '" + file + "'"); });
+		Platform.runLater(() -> { Worker.fin(); Prgm.addStep(Localization.getLocalized("deleting", file)); });
 		if(!f.delete()) {
 			f.deleteOnExit();
 		}
-		Platform.runLater(() -> { Prgm.addStep("     ..Done", true); });
+		Platform.runLater(() -> { Prgm.addStep("     .." +
+				Localization.getLocalized("done"), true); });
 	}, "File");
 
 	public Action action;

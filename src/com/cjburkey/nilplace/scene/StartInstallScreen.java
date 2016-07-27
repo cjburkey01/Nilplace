@@ -4,6 +4,7 @@ import com.cjburkey.nilplace.Nilplace;
 import com.cjburkey.nilplace.file.WorkerFile;
 import com.cjburkey.nilplace.install.LoadData;
 import com.cjburkey.nilplace.install.Worker;
+import com.cjburkey.nilplace.local.Localization;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -26,15 +27,15 @@ public class StartInstallScreen {
 		VBox center = new VBox();
 		
 		Label t = new Label(LoadData.getName());
-		Button go = new Button("Continue");
-		Button cancel = new Button("Cancel");
+		Button go = new Button(Localization.getLocalized("continue"));
+		Button cancel = new Button(Localization.getLocalized("cancel"));
 		
-		Label l = new Label("This program will run the following commands:");
+		Label l = new Label(Localization.getLocalized("runMultiCommands"));
 		TextArea te = new TextArea();
 		te.setWrapText(false);
 		te.setEditable(false);
 		
-		te.appendText("Commands:\n");
+		te.appendText(Localization.getLocalized("commands") + ":\n");
 		for(WorkerFile f : Worker.workers) {
 			String args = "";
 			for(String st : f.args) {

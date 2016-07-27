@@ -7,9 +7,11 @@ import java.net.URL;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
+import com.cjburkey.nilplace.local.Localization;
 import com.cjburkey.nilplace.scene.LaunchInstaller;
 import com.cjburkey.nilplace.scene.LaunchMain;
 import javafx.application.Application;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Label;
@@ -33,7 +35,7 @@ public class Nilplace extends Application {
 		stage.setScene(LaunchMain.go(stage));
 		if(error != null) {
 			Alert a = new Alert(AlertType.ERROR);
-			a.setTitle("An error occurred!");
+			a.setTitle(Localization.getLocalized("basicError"));
 			a.setContentText(error);
 			a.showAndWait();
 		}
@@ -60,16 +62,16 @@ public class Nilplace extends Application {
 	}
 	
 	public static final void err(Throwable t, boolean display) {
-		err("An error occurred!");
-		err("Main error: '" + t.getMessage() + "'");
-		err("--[ BEGIN ERR REPORT STACKTRACE ]--");
+		err(Localization.getLocalized("basicError"));
+		err(Localization.getLocalized("mainError", t.getMessage()));
+		err(Localization.getLocalized("beginErrRep"));
 		t.printStackTrace();
-		err("--[ END ERR REPORT STACKTRACE ]--");
+		err(Localization.getLocalized("endErrRep"));
 		
 		if(display) {
 			Alert alert = new Alert(AlertType.ERROR);
-			alert.setTitle("An error occurred!");
-			alert.setHeaderText("Click \"Show Details\" to view the throwable stacktace.");
+			alert.setTitle(Localization.getLocalized("basicError"));
+			alert.setHeaderText(Localization.getLocalized("clickShowDetails"));
 			alert.setContentText(t.getMessage());
 			
 			StringWriter sw = new StringWriter();
@@ -77,7 +79,7 @@ public class Nilplace extends Application {
 			t.printStackTrace(pw);
 			String exceptionText = sw.toString();
 
-			Label label = new Label("Stacktrace:");
+			Label label = new Label(Localization.getLocalized("stacktrace"));
 			
 			TextArea textArea = new TextArea(exceptionText);
 			textArea.setEditable(false);
@@ -114,39 +116,42 @@ public class Nilplace extends Application {
 			String value = arg.getValue();
 			
 			if(key.equalsIgnoreCase("downloadInfoFile")) {
-				log("Found valid argument: '" + key + "' = '" + value + "'.");
+				log(Localization.getLocalized("argumentValid", key, value));
 				downloadInfoFile = value.trim();
 			}
 		}
 		
 		if(downloadInfoFile == null) {
-			log("Didn't find main info file.");
+			log(Localization.getLocalized("noMainInfo"));
 			s.setScene(LaunchMain.go(s));
 		} else {
-			log("Found main info file.");
+			log(Localization.getLocalized("mainInfoFound"));
 			s.setScene(LaunchInstaller.go(s, downloadInfoFile));
 		}
 		
 		s.setWidth(Screen.getPrimary().getVisualBounds().getWidth() / 2);
 		s.setHeight(Screen.getPrimary().getVisualBounds().getHeight() / 2);
 		s.centerOnScreen();
-		s.setTitle("Nilplace");
+		s.setTitle(Localization.getLocalized("windowTitle"));
 		s.setResizable(false);
 		s.show();
 		s.getIcons().add(new Image("img/icon.png"));
 		
-		log("Done.", false);
+		log(Localization.getLocalized("done"), false);
 	}
 	
 	public static void main(String[] args) {
-		log("Launching", false);
+		Localization.loadLocalizations("en");
+		OS.init();
+		log(Localization.getLocalized("launching"), false);
 		launch(args);
 	}
 	
 	public static final void install(Stage s, String durl) {
 		try {
 			new URL(durl);
-			s.setScene(LaunchInstaller.go(s, durl));
+			Scene sc = LaunchInstaller.go(s, durl);
+			if(sc != null) s.setScene(sc);
 		} catch(Exception e) { err(e); }
 	}
 	

@@ -10,6 +10,7 @@ import com.cjburkey.nilplace.InstallerInfo;
 import com.cjburkey.nilplace.Nilplace;
 import com.cjburkey.nilplace.file.Util;
 import com.cjburkey.nilplace.install.InstallerAction;
+import com.cjburkey.nilplace.local.Localization;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -43,15 +44,14 @@ public class LaunchMain {
 	public static ListView<InstallerInfo> list;
 	
 	public static final Scene go(Stage s) {
-		Nilplace.log("Launching program.");
 		BorderPane root = new BorderPane();
 		Scene scene = new Scene(root);
 		
 		s.setOnCloseRequest(e -> {  });
 		
-		Tab myPrograms = new Tab("Installed Programs", tabList());
-		Tab install = new Tab("Install New Program", tabInstall(s));
-		Tab create = new Tab("Create Installer", tabCreate(s));
+		Tab myPrograms = new Tab(Localization.getLocalized("installed"), tabList());
+		Tab install = new Tab(Localization.getLocalized("newProg"), tabInstall(s));
+		Tab create = new Tab(Localization.getLocalized("createInst"), tabCreate(s));
 		
 		pane = new TabPane();
 		pane.getTabs().addAll(myPrograms, install, create);
@@ -79,8 +79,8 @@ public class LaunchMain {
 		list = new ListView<InstallerInfo>();
 		list.getItems().addAll(InstallerInfo.reloadViews());
 		
-		MenuItem launch = new MenuItem("Launch Program");
-		MenuItem delete = new MenuItem("Delete Program");
+		MenuItem launch = new MenuItem(Localization.getLocalized("launchProgram"));
+		MenuItem delete = new MenuItem(Localization.getLocalized("deleteProgram"));
 		ContextMenu m = new ContextMenu(launch, delete);
 		
 		delete.setOnAction(e -> {
@@ -95,8 +95,7 @@ public class LaunchMain {
 			int count = e.getClickCount();
 			v = list.getSelectionModel().getSelectedItem();
 			if(v != null) {
-				int id = v.id;
-				Nilplace.log("Application id: " + id);
+				//int id = v.id;
 				if(count == 2 && e.getButton().equals(MouseButton.PRIMARY)) {
 					
 				} else if(count == 1 && e.getButton().equals(MouseButton.SECONDARY)) {
@@ -117,22 +116,22 @@ public class LaunchMain {
 	private static final Node tabInstall(Stage s) {
 		VBox inst = new VBox();
 		
-		Button loadFromFile = new Button("Install From File");
+		Button loadFromFile = new Button(Localization.getLocalized("installFromFile"));
 		TextField url = new TextField();
-		Button start = new Button("Install");
+		Button start = new Button(Localization.getLocalized("install"));
 		
 		inst.setPadding(new Insets(10));
 		inst.setSpacing(10);
 		inst.setAlignment(Pos.CENTER);
 		inst.getChildren().addAll(loadFromFile, url, start);
-		url.setPromptText("URL of Installation Information File.");
+		url.setPromptText(Localization.getLocalized("urlOfFile"));
 		start.setOnAction(e -> { Nilplace.install(s, url.getText()); });
 		loadFromFile.setOnAction(e -> {
 			FileChooser fc = new FileChooser();
-			fc.setTitle("Open Installer");
+			fc.setTitle(Localization.getLocalized("openInstaller"));
 			fc.getExtensionFilters().addAll(
-				new ExtensionFilter("Nilscript Files", "*.ns"),
-				new ExtensionFilter("All Files", "*.*")
+				new ExtensionFilter(Localization.getLocalized("nilscriptFiles"), "*.ns"),
+				new ExtensionFilter(Localization.getLocalized("allFiles"), "*.*")
 			);
 			File f = fc.showOpenDialog(s);
 			if(f != null) {
@@ -146,15 +145,15 @@ public class LaunchMain {
 	private static final Node tabCreate(Stage s) {
 		BorderPane make = new BorderPane();
 		
-		Label l = new Label("Insert: ");
+		Label l = new Label(Localization.getLocalized("insert") + ": ");
 		for(InstallerAction a : InstallerAction.values()) {
 			Button but = new Button(a.name());
 			initAction(but);
 			buttons.add(but);
 		}
-		Label la = new Label("File: ");
-		Button save = new Button("Save");
-		Button load = new Button("Load");
+		Label la = new Label(Localization.getLocalized("file") + ": ");
+		Button save = new Button(Localization.getLocalized("save"));
+		Button load = new Button(Localization.getLocalized("load"));
 		code = new TextArea();
 		ToolBar toolb = new ToolBar();
 		toolb.getItems().addAll(l);
@@ -236,8 +235,9 @@ public class LaunchMain {
 			FileChooser fc = new FileChooser();
 			fc.setTitle("Save");
 			fc.setInitialDirectory(new File(System.getProperty("user.home")));
-			fc.getExtensionFilters().addAll( new ExtensionFilter("Nilscript File", "*.ns"),
-					new ExtensionFilter("All Files", "*.*"));
+			fc.getExtensionFilters().addAll(
+					new ExtensionFilter(Localization.getLocalized("nilscriptFiles"), "*.ns"),
+					new ExtensionFilter(Localization.getLocalized("allFiles"), "*.*"));
 			
 			File f = fc.showSaveDialog(s);
 			if(f != null) {
@@ -259,8 +259,9 @@ public class LaunchMain {
 			FileChooser fc = new FileChooser();
 			fc.setTitle("Load");
 			fc.setInitialDirectory(new File(System.getProperty("user.home")));
-			fc.getExtensionFilters().addAll( new ExtensionFilter("Nilscript File", "*.ns"),
-					new ExtensionFilter("All Files", "*.*"));
+			fc.getExtensionFilters().addAll(
+					new ExtensionFilter(Localization.getLocalized("nilscriptFiles"), "*.ns"),
+					new ExtensionFilter(Localization.getLocalized("allFiles"), "*.*"));
 			
 			File f = fc.showOpenDialog(s);
 			if(f != null) {

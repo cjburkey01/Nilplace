@@ -2,6 +2,7 @@ package com.cjburkey.nilplace.scene;
 
 import com.cjburkey.nilplace.Nilplace;
 import com.cjburkey.nilplace.install.LoadData;
+import com.cjburkey.nilplace.local.Localization;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -23,14 +24,14 @@ public class Done {
 		VBox center = new VBox();
 		HBox bottom = new HBox();
 		
-		Button finish = new Button("Close Installer.");
+		Button finish = new Button(Localization.getLocalized("closeInstaller"));
 		
 		bottom.getChildren().addAll(finish);
 		bottom.setAlignment(Pos.CENTER_RIGHT);
 		bottom.setSpacing(10);
 		bottom.setPadding(new Insets(10));
 		
-		center.getChildren().addAll(new Label("The installation is complete!"));
+		center.getChildren().addAll(new Label(Localization.getLocalized("installerFin")));
 		center.setAlignment(Pos.CENTER);
 		center.setSpacing(10);
 		center.setPadding(new Insets(10));

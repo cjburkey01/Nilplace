@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Scanner;
 import com.cjburkey.nilplace.Nilplace;
+import com.cjburkey.nilplace.local.Localization;
 import com.cjburkey.nilplace.nilscript.ReadScript;
 
 public class LoadData {
@@ -13,7 +14,7 @@ public class LoadData {
 	private static List<String> lines;
 	private static String name;
 	
-	private static String winLaunch, macLaunch, linLaunch;
+	public static String winLaunch, macLaunch, linLaunch;
 	
 	public static final boolean load(String url) {
 		lines = new ArrayList<String>();
@@ -45,22 +46,22 @@ public class LoadData {
 			p.load(new URL(url).openStream());
 			Nilplace.log(url + " - " + p.keySet());
 			if((name = p.getProperty("programName")) == null) {
-				Nilplace.err("No name found.  Not installing.");
-				Nilplace.resetScene("No installer name found.  Not installing.");
+				Nilplace.err(Localization.getLocalized("noNameFound"));
+				Nilplace.resetScene(Localization.getLocalized("noNameFound"));
 				return false;
 			}
 			winLaunch = p.getProperty("winLaunch");
 			macLaunch = p.getProperty("macLaunch");
 			linLaunch = p.getProperty("linLaunch");
 			if(winLaunch == null && macLaunch == null && linLaunch == null) {
-				Nilplace.err("No valid launch found.  Not installing.");
-				Nilplace.resetScene("No valid launch method found.  Not installing.");
+				Nilplace.err(Localization.getLocalized("noLaunchMethod"));
+				Nilplace.resetScene(Localization.getLocalized("noLaunchMethod"));
 				return false;
 			}
 			return true;
 		} catch(Exception e) {
 			Nilplace.err(e);
-			Nilplace.resetScene("There was an error finding information on the installer.");
+			Nilplace.resetScene(Localization.getLocalized("noInstallerInfo"));
 		}
 		return false;
 	}
